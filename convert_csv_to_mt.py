@@ -9,6 +9,7 @@ from struct import pack, pack_into, calcsize
 import time
 import datetime
 import mmap
+import traceback 
 
 class Spinner:
     def __init__(self, step):
@@ -364,7 +365,10 @@ class FXT(Output):
                       'volume': tick['bidVolume']
             }
 
-            if not self._firstUniBar: self._firstUniBar = uniBar             # Store first and ...
+            if not self._firstUniBar: 
+                print('[DEBUG] setting _firstUniBar')
+                traceback.print_stack()
+                self._firstUniBar = uniBar             # Store first and ...
             self._lastUniBar = uniBar                                        # ... last bar data for header.
             self.path.write(pack('<iiddddQii',
                     int(uniBar['barTimestamp']),                                 # Bar datetime.
