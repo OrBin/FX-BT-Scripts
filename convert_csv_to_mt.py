@@ -558,6 +558,7 @@ if __name__ == '__main__':
         if args.verbose:
             print('[INFO] Finalizing...')
         for obj in queue:
+            print("Obj: " + str(obj))
             obj.finalize()
         if args.verbose:
             print('[INFO] Done.')
