@@ -382,6 +382,8 @@ class FXT(Output):
         # Fixup the header.
         self.path.seek(216)
         fix  = bytearray()
+        if self._firstUniBar == None:
+            print(str(self))
         fix += pack('<III',
                 self.barCount,
                 int(self._firstUniBar['barTimestamp']),                    # Modelling start date - date of the first tick.
@@ -539,7 +541,7 @@ if __name__ == '__main__':
             # Tick is beyond current bar's timeline, aggregating unaggregated
             # ticks:
                 if len(ticksToAggregate) > 0:
-                    print(str(ticksToAggregate))
+                    #print(str(ticksToAggregate))
                     obj.pack_ticks(ticksToAggregate)
                 
                 # Next bar's timeline will begin from this new tick's bar
