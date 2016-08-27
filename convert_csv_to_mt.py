@@ -508,60 +508,60 @@ if __name__ == '__main__':
     try:
         # Getting first output from the queue
         # @fixit We should iterate over queue
-        obj = queue[0]
+        for obj in queue:#obj = queue[0]
 
-        ticks = CSV(args.inputFile);
+            ticks = CSV(args.inputFile);
 
-        startTimestamp = None
+            startTimestamp = None
 
-        # We will retrieve all ticks in the timeframe into following array and update their LowBid/HighBid
-        ticksToJoin      = [];
-        ticksToAggregate = [];
+            # We will retrieve all ticks in the timeframe into following array and update their LowBid/HighBid
+            ticksToJoin      = [];
+            ticksToAggregate = [];
 
-        for (tick, isLastRow) in ticks:
-            # Beginning of the bar's timeline.
-            tick['barTimestamp'] = int(tick['timestamp']) - int(tick['timestamp']) % obj.deltaTimestamp
+            for (tick, isLastRow) in ticks:
+                # Beginning of the bar's timeline.
+                tick['barTimestamp'] = int(tick['timestamp']) - int(tick['timestamp']) % obj.deltaTimestamp
 
-            # Tick's timestamp will be rounded to 1 for M1 and 60 for other.
-            tick['timestamp'] = int(tick['timestamp']) - int(tick['timestamp']) % (1 if obj.deltaTimestamp == 60 else 60)
+                # Tick's timestamp will be rounded to 1 for M1 and 60 for other.
+                tick['timestamp'] = int(tick['timestamp']) - int(tick['timestamp']) % (1 if obj.deltaTimestamp == 60 else 60)
 
-            if not startTimestamp:
-                startTimestamp = tick['barTimestamp']
+                if not startTimestamp:
+                    startTimestamp = tick['barTimestamp']
 
-            # Tick after this time won't be used for LowBid/HighBid aggregation.
-            endTimestampAggregate = startTimestamp + 60
+                # Tick after this time won't be used for LowBid/HighBid aggregation.
+                endTimestampAggregate = startTimestamp + 60
 
-            # Determines the end of the current bar.
-            endTimestampTimeline  = startTimestamp + obj.deltaTimestamp
+                # Determines the end of the current bar.
+                endTimestampTimeline  = startTimestamp + obj.deltaTimestamp
 
-            # Indicates whether we use tick's LowBid/HighBid when aggregating.
-            # E.g., when aggregating M5 we use only the first 1 min of data.  
-            tick['merge'] = tick['timestamp'] < endTimestampAggregate
+                # Indicates whether we use tick's LowBid/HighBid when aggregating.
+                # E.g., when aggregating M5 we use only the first 1 min of data.
+                tick['merge'] = tick['timestamp'] < endTimestampAggregate
 
-            if tick['timestamp'] >= endTimestampTimeline:
-            # Tick is beyond current bar's timeline, aggregating unaggregated
-            # ticks:
-                if len(ticksToAggregate) > 0:
-                    #print(str(ticksToAggregate))
-                    obj.pack_ticks(ticksToAggregate)
-                
-                # Next bar's timeline will begin from this new tick's bar
-                # timestamp.
-                startTimestamp   = tick['barTimestamp']
+                if tick['timestamp'] >= endTimestampTimeline:
+                # Tick is beyond current bar's timeline, aggregating unaggregated
+                # ticks:
+                    if len(ticksToAggregate) > 0:
+                        #print(str(ticksToAggregate))
+                        obj.pack_ticks(ticksToAggregate)
 
-                # Tick beyond delta timeframe will be aggregated in the next
-                # timeframe 
-                ticksToAggregate = [tick]
-            else:
-            # Tick is within the current bar's timeline, queuing for
-            # aggregation.
-                ticksToAggregate.append(tick)
+                    # Next bar's timeline will begin from this new tick's bar
+                    # timestamp.
+                    startTimestamp   = tick['barTimestamp']
 
-            spinner.spin()
+                    # Tick beyond delta timeframe will be aggregated in the next
+                    # timeframe
+                    ticksToAggregate = [tick]
+                else:
+                # Tick is within the current bar's timeline, queuing for
+                # aggregation.
+                    ticksToAggregate.append(tick)
 
-        # Writting the last tick if not yet written.
-        if len(ticksToAggregate) > 0:
-            obj.pack_ticks(ticksToAggregate)
+                spinner.spin()
+
+            # Writting the last tick if not yet written.
+            if len(ticksToAggregate) > 0:
+                obj.pack_ticks(ticksToAggregate)
 
         if args.verbose:
             print('[INFO] Finalizing...')
