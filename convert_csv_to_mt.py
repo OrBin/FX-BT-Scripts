@@ -368,6 +368,7 @@ class FXT(Output):
             if not self._firstUniBar: 
                 print('[DEBUG] setting _firstUniBar')
                 traceback.print_stack()
+                print(str(self))
                 self._firstUniBar = uniBar             # Store first and ...
             self._lastUniBar = uniBar                                        # ... last bar data for header.
             self.path.write(pack('<iiddddQii',
