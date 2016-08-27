@@ -539,6 +539,7 @@ if __name__ == '__main__':
             # Tick is beyond current bar's timeline, aggregating unaggregated
             # ticks:
                 if len(ticksToAggregate) > 0:
+                    print(str(ticksToAggregate))
                     obj.pack_ticks(ticksToAggregate)
                 
                 # Next bar's timeline will begin from this new tick's bar
